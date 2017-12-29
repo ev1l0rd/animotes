@@ -34,8 +34,8 @@ class Animotes:
 def emote_corrector(self, message):
     '''Locate and change any emotes to emote objects'''
     r = re.compile(r':\w+:')
-    emotes = []
     found = r.findall(message.content)
+    emotes = []
     for em in found:
         temp = discord.utils.get(self.bot.emojis, name=em[1:-1])
         try:
@@ -52,9 +52,11 @@ def emote_corrector(self, message):
         return None
 
     escape = re.compile(r':*<\w?:\w+:\w+>')
+    # This escapes all colons that come before an emoji;
+    # thanks to Discord shenanigans, this is needed.
     for esc in set(escape.findall(temp)):
         temp_esc = esc.split('<')
-        esc_s = '{}<{}'.format(temp_esc[0].replace(":", "\:"), temp_esc[1])
+        esc_s = '{}<{}'.format(temp_esc[0].replace(':', '\:'), temp_esc[1])
         print(esc)
         temp = temp.replace(esc, esc_s)
 
