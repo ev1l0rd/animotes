@@ -55,6 +55,15 @@ class Animotes:
             pass
         await ctx.message.author.send(content=message)
 
+    @commands.command()
+    async def list_emotes(self, ctx):
+        all_emojis = []
+        for emoji in self.bot.emojis:
+            all_emojis.append(str(emoji))
+
+        all_emojis = " ".join(all_emojis)
+        await ctx.author.send(content=all_emojis)
+
 
 def emote_corrector(self, message):
     '''Locate and change any emotes to emote objects'''
