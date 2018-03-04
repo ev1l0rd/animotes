@@ -41,6 +41,7 @@ class Animotes:
 
     @commands.command(aliases=['unregister'])
     async def register(self, ctx):
+        '''Register/Unregister from animated emotes.'''
         if self.conn.cursor().execute('SELECT * FROM animotes WHERE user_id=?', (ctx.author.id,)).fetchone():
             self.conn.cursor().execute('DELETE FROM animotes WHERE user_id=?', (ctx.author.id,))
             message = 'You sucessfully have been opted out of using animated emotes.'
@@ -57,12 +58,21 @@ class Animotes:
 
     @commands.command()
     async def list_emotes(self, ctx):
-        all_emojis = []
-        for emoji in self.bot.emojis:
-            all_emojis.append(str(emoji))
-
-        all_emojis = " ".join(all_emojis)
-        await ctx.author.send(content=all_emojis)
+        '''Lists all animated emotes the bot 'knows'.'''
+        message = []
+        for guild in self.bot.guilds:
+            emoji = guild.emojis
+            if emoji:
+                message.append(f'Emoji\'s in guild __{guild.name}__:')
+                for emoji in guild.emojis:
+                     if emoji.animated:
+                        message.append(f'**{emoji.name}**: {emoji}')
+        if not message:
+            message.append('I\'m not in any guilds with emoji\'s.')
+            message.append('Try adding me to a guild with emoji\'s.)
+            
+        message = "\n".join(message)
+        await ctx.author.send(content=message)
 
 
 def emote_corrector(self, message):
