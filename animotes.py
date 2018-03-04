@@ -65,12 +65,12 @@ class Animotes:
             if emoji:
                 message.append(f'Emoji\'s in guild __{guild.name}__:')
                 for emoji in guild.emojis:
-                     if emoji.animated:
+                    if emoji.animated:
                         message.append(f'**{emoji.name}**: {emoji}')
         if not message:
             message.append('I\'m not in any guilds with emoji\'s.')
-            message.append('Try adding me to a guild with emoji\'s.)
-            
+            message.append('Try adding me to a guild with emoji\'s.')
+
         message = "\n".join(message)
         await ctx.author.send(content=message)
 
