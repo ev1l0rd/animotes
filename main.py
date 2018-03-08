@@ -41,6 +41,6 @@ async def on_ready():
     print('------------')
     load_cog('animotes')
     print('Loaded animotes cog...')
-    await bot.change_presence(game=discord.Game(name='Use ' + config['prefix'] + 'register to enable me'))
+    await bot.change_presence(activity=discord.Game(name='Use ' + config['prefix'] + 'register to enable me'))
 
 bot.run(config['token'])
