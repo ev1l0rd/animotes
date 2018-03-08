@@ -1,5 +1,6 @@
 import discord
 import yaml
+from heroku_git_fs import HerokuGitFS
 from discord.ext import commands
 
 config = yaml.safe_load(open('config.yaml'))
@@ -19,6 +20,8 @@ def load_cog(cog):
 
 @bot.event
 async def on_ready():
+    if config['remote_url']:
+        bot.heroku_git_fs = HerokuGitFS(remote_url=config['remote_url'], directory='databases', branch='master')
     print('------------')
     print('Logged in as:')
     print(bot.user.name)

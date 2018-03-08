@@ -23,9 +23,10 @@ import sqlite3
 class Animotes:
     def __init__(self, bot):
         self.bot = bot
-        self.conn = sqlite3.connect('animotes.sqlite3')
+        self.conn = sqlite3.connect('databases/animotes.sqlite3')
         create_database(self.conn)
         self.conn.commit()
+        self.bot.heroku_git_fs.update()
 
     async def on_message(self, message):
         if not message.author.bot and self.conn.cursor().execute('SELECT * FROM animotes WHERE user_id=?', (message.author.id,)).fetchone():
@@ -50,6 +51,7 @@ class Animotes:
             message = 'You sucessfully have been opted into using using animated emotes.'
 
         self.conn.commit()
+        self.bot.heroku_git_fs.update()
         try:
             await ctx.message.delete()
         except discord.errors.Forbidden:
@@ -74,6 +76,11 @@ class Animotes:
 
         for page in message.pages:
             await ctx.author.send(content=page)
+
+    @commands.command()
+    async def toggle_emoji(self, ctx):
+        '''Block a specific emoji'''
+        pass
 
 
 def emote_corrector(self, message):
