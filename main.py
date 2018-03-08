@@ -2,8 +2,18 @@ import discord
 import yaml
 from heroku_git_fs import HerokuGitFS
 from discord.ext import commands
+import os
 
-config = yaml.safe_load(open('config.yaml'))
+if 'ON_HEROKU' not in os.environ:
+    config = yaml.safe_load(open('config.yaml'))
+else:
+    config = {
+        'token': os.environ.get('TOKEN'),
+        'prefix': os.environ.get('PREFIX'),
+        'remote_url': os.environ.get('REMOTE_URL')
+    }
+
+
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(
     config['prefix']),
     description='A bot to make non Nitro members use non-global Nitro emotes on the servers it is in.',
