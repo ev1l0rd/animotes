@@ -26,7 +26,10 @@ class Animotes:
         self.conn = sqlite3.connect('databases/animotes.sqlite3')
         create_database(self.conn)
         self.conn.commit()
-        self.bot.heroku_git_fs.update()
+        try:
+            self.bot.heroku_git_fs.update()
+        except AttributeError as e:
+            pass
 
     async def on_message(self, message):
         if not message.author.bot and self.conn.cursor().execute('SELECT * FROM animotes WHERE user_id=?', (message.author.id,)).fetchone():
@@ -49,9 +52,13 @@ class Animotes:
         else:
             self.conn.cursor().execute('INSERT INTO animotes VALUES (?)', (ctx.author.id,))
             message = 'You sucessfully have been opted into using using animated emotes.'
-
         self.conn.commit()
-        self.bot.heroku_git_fs.update()
+
+        try:
+            self.bot.heroku_git_fs.update()
+        except AttributeError as e:
+            pass
+
         try:
             await ctx.message.delete()
         except discord.errors.Forbidden:

@@ -1,8 +1,12 @@
 import discord
 import yaml
-from heroku_git_fs import HerokuGitFS
+try:
+    from heroku_git_fs import HerokuGitFS
+except ModuleNotFoundError as e:
+    pass
 from discord.ext import commands
 import os
+import shutil
 
 if 'ON_HEROKU' not in os.environ:
     config = yaml.safe_load(open('config.yaml'))
@@ -13,6 +17,10 @@ else:
         'remote_url': os.environ.get('REMOTE_URL')
     }
 
+if 'remote_url' in config and os.path.isdir('databases'):  # Only purge if the user specifies a remote URL while not on an ephemeral system
+    shutil.rmtree('databases')
+elif not os.path.isdir('databases'):
+    os.makedirs('databases')
 
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(
     config['prefix']),
@@ -30,7 +38,7 @@ def load_cog(cog):
 
 @bot.event
 async def on_ready():
-    if config['remote_url']:
+    if 'remote_url' in config:
         bot.heroku_git_fs = HerokuGitFS(remote_url=config['remote_url'], directory='databases', branch='master')
     print('------------')
     print('Logged in as:')
