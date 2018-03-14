@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 import re
 import sqlite3
+import os
+import mimetypes
+import magic
+import shutil
 
 #    Cog to reformat messages to allow for animated emotes, regardless of nitro status.
 #    Copyright (C) 2017 Valentijn <ev1l0rd>
@@ -31,16 +35,40 @@ class Animotes:
         except AttributeError as e:
             pass
 
+    async def remove_original_message(self, message):
+        try:
+            await message.delete()
+        except Exception:
+            pass
+
     async def on_message(self, message):
         if not message.author.bot and self.conn.cursor().execute('SELECT * FROM animotes WHERE user_id=?', (message.author.id,)).fetchone():
             channel = message.channel
             content = emote_corrector(self, message)
             if content:
-                try:
-                    await message.delete()
-                except Exception:
-                    pass
+                if message.attachments:
+                    os.makedirs('tmp')
+                    for i, attachment in enumerate(message.attachments):
+                        await attachment.save('tmp/{}'.format(i))
+
+                    for filename in os.listdir('tmp/'):
+                        try:
+                            mimetype = magic.from_file('tmp/{}'.format(filename), mime=True)
+                            mimetype = mimetypes.guess_extension(mimetype)
+                            if mimetype:
+                                os.rename(src='tmp/{}'.format(filename), dst='tmp/{0}{1}'.format(filename, mimetype))
+                        except Exception as e:
+                            pass
+
+                    files = []
+                    for filename in os.listdir('tmp'):
+                        files.append(discord.File(os.path.abspath('tmp/{}'.format(filename))))
+
+                    await self.remove_original_message(message)
+                    await channel.send(content=content, files=files)
+                    shutil.rmtree('tmp/')
                 else:
+                    await self.remove_original_message(message)
                     await channel.send(content=content)
 
     @commands.command(aliases=['unregister'])
